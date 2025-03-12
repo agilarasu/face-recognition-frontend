@@ -18,6 +18,7 @@ export default function Home() {
     const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
     const [isCameraReady, setIsCameraReady] = useState(false);
     const isMobile = useMobile();
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const getDevices = useCallback(async () => {
         try {
@@ -69,10 +70,19 @@ export default function Home() {
             setCapturedImage(imageSrc);
             setStatusMessage('Processing...');
             setStatusType('info');
+            setIsProcessing(true);
 
             const imageDataBase64 = imageSrc.split(',')[1];
+            
+            // Get Azure Function URL from environment variable
+            const azureFunctionUrl = process.env.NEXT_PUBLIC_AZURE_FUNCTION_URL;
+            
+            if (!azureFunctionUrl) {
+                throw new Error("Azure Function URL not configured");
+            }
 
-            const response = await axios.post('/api/process-attendance', {
+            // Call Azure Function directly
+            const response = await axios.post(azureFunctionUrl, {
                 image: imageDataBase64,
             });
 
@@ -82,6 +92,8 @@ export default function Home() {
             console.error("Error processing attendance:", error);
             setStatusMessage("Error processing attendance. Please try again.");
             setStatusType('error');
+        } finally {
+            setIsProcessing(false);
         }
     }, [webcamRef]);
 
@@ -171,7 +183,7 @@ export default function Home() {
                         {!capturedImage ? (
                             <Button 
                                 onClick={capture}
-                                disabled={!isCameraReady}
+                                disabled={!isCameraReady || isProcessing}
                                 className="bg-[#0071e3] hover:bg-[#0077ed] text-white font-medium py-2 px-6 rounded-full transition-all"
                             >
                                 <Camera className="mr-2 h-5 w-5" />
@@ -180,6 +192,7 @@ export default function Home() {
                         ) : (
                             <Button 
                                 onClick={resetCapture}
+                                disabled={isProcessing}
                                 variant="outline"
                                 className="border-[#0071e3] text-[#0071e3] hover:bg-[#0071e3]/10 font-medium py-2 px-6 rounded-full transition-all"
                             >

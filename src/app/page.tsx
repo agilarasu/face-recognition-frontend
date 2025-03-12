@@ -133,7 +133,7 @@ export default function Home() {
           <CardHeader className="space-y-1 pb-2">
             <div className="flex items-center gap-2">
               <Shield className="h-6 w-6 text-primary" />
-              <CardTitle className="text-2xl font-bold tracking-tight">AI Attendance System</CardTitle>
+              <CardTitle className="text-2xl font-bold tracking-tight">Face Recognition System</CardTitle>
             </div>
             <CardDescription className="text-muted-foreground">
               Capture your attendance with our advanced facial recognition system

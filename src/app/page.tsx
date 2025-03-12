@@ -73,16 +73,9 @@ export default function Home() {
             setIsProcessing(true);
 
             const imageDataBase64 = imageSrc.split(',')[1];
-            
-            // Get Azure Function URL from environment variable
-            const azureFunctionUrl = process.env.NEXT_PUBLIC_AZURE_FUNCTION_URL;
-            
-            if (!azureFunctionUrl) {
-                throw new Error("Azure Function URL not configured");
-            }
 
             // Call Azure Function directly
-            const response = await axios.post(azureFunctionUrl, {
+            const response = await axios.post("/api/process_attendance", {
                 image: imageDataBase64,
             });
 
